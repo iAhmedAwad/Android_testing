@@ -7,6 +7,7 @@ import com.haroldadmin.cnradapter.NetworkResponseAdapterFactory
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.trianglz.android_testing.data.HorseService
 import com.trianglz.android_testing.data.local.HorsesDatabase
 import com.trianglz.common.Constants
 import com.trianglz.task.common.di.viewmodel.DaggerViewModelFactory
@@ -59,14 +60,15 @@ abstract class AppModule {
             .addCallAdapterFactory(NetworkResponseAdapterFactory())
             .client(okHttpClient)
             .build()
+
+        @Singleton
+        @Provides
+        fun provideHorseDatabase(application: Application) =
+            Room.databaseBuilder(application, HorsesDatabase::class.java, Constants.DATABASE_NAME)
+
+        @Singleton
+        @Provides
+        fun provideHorseDao(database: HorsesDatabase) = database.horseDao()
     }
-
-    @Singleton
-    @Provides
-    fun provideHorseDatabase(application: Application) =
-        Room.databaseBuilder(application, HorsesDatabase::class.java, Constants.DATABASE_NAME)
-
-    @Singleton
-    @Provides
-    fun provideHorseDao(database: HorsesDatabase) = database.horseDao()
+fun provideHorseService(retrofit: Retrofit) = retrofit.create(HorseService::class.java)
 }
